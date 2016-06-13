@@ -1,6 +1,6 @@
 {
   "name": "amdcdn",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "An AMD module loader that can load modules from a CDN",
   "main": "index.js",
   "scripts": {
