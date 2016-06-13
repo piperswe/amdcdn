@@ -16,7 +16,6 @@ function debug(...args) {
 }
 
 import { resolve as resolveSemver } from './node_modules/u-semver/src/u-semver.js';
-import { jsdelivr as remoteModules } from './jsdelivr.js';
 
 // Regex from https://github.com/requirejs/requirejs/blob/master/require.js#L15
 const commentRegex = /(\/\*([\s\S]*?)\*\/|([^:]|^)\/\/(.*)$)/mg;
