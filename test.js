@@ -1,4 +1,12 @@
-define(['jquery@3.0.0', 'd3js@3.5.17'], function ($/*, d3*/) {
+define('changeColors', ['d3js@3.5.17'], function () {
+    return function () {
+        d3.selectAll('*').style('color', () =>
+            `hsl(${Math.random() * 360},100%,50%)`
+        );
+    }
+});
+
+define(['jquery@3.0.0', 'd3js@3.5.17', 'changeColors'], function ($, _, changeColors) {
     $('#container').text('Hello, world! This is executed using a ' +
         'little module loader called AMDCDN. jQuery ' +
         'is pulled from jsDelivr dynamically through ' +
@@ -11,7 +19,5 @@ define(['jquery@3.0.0', 'd3js@3.5.17'], function ($/*, d3*/) {
     });
     $('#container').append($('<pre></pre>').append(code));
 
-    d3.selectAll('*').style('color', () =>
-        `hsl(${Math.random() * 360},100%,50%)`
-    );
+    changeColors();
 });
