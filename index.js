@@ -35,6 +35,9 @@ function resolve(module) {
     const split = module.split('@');
     const name = split[0];
     const range = split[1] || 'latest';
+    if (localStorage.getItem(`amdcdn:${name}`) != null) {
+        return Promise.resolve(JSON.parse(localStorage.getItem(`amdcdn:${name}`)));
+    }
     return fetch(`http://api.jsdelivr.com/v1/jsdelivr/libraries?name=${name}`)
         .then(response => response.json())
         .then(result => {
@@ -52,6 +55,9 @@ function resolve(module) {
             } else {
                 return { name, range };
             }
+        }).then(resolved => {
+            localStorage.setItem(`amdcdn:${name}`, JSON.stringify(resolved));
+            return resolved;
         });
 }
 
