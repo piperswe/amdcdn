@@ -125,6 +125,7 @@
       }
       return fetch(`http://api.jsdelivr.com/v1/jsdelivr/libraries?name=${name}`)
           .then(response => response.json())
+          .catch(exception => [])
           .then(result => {
               if (result.length === 1) {
                   const library = result[0];
