@@ -1,9 +1,3 @@
-// jsdelivr-rum
-(function(a,b,c,d,e){function f(){var a=b.createElement("script");a.async=!0;
-a.src="//radar.cedexis.com/1/11475/radar.js";b.body.appendChild(a)}/\bMSIE 6/i
-.test(a.navigator.userAgent)||(a[c]?a[c](e,f,!1):a[d]&&a[d]("on"+e,f))})
-(window,document,"addEventListener","attachEvent","load");
-
 /*
 Copyright (c) 2016 Zebulon McCorkle
 
@@ -41,11 +35,24 @@ function resolve(module) {
     const split = module.split('@');
     const name = split[0];
     const range = split[1] || 'latest';
-    if (remoteModules[name] != null) {
-        return { name, range, url: remoteModules[name][resolveSemver(range, Object.keys(remoteModules[name]))] };
-    } else {
-        return { name, range };
-    }
+    return fetch(`http://api.jsdelivr.com/v1/jsdelivr/libraries?name=${name}`)
+        .then(response => response.json())
+        .then(result => {
+            if (result.length === 1) {
+                const library = result[0];
+                let version;
+                try {
+                    version = resolveSemver(range, library.versions);
+                } catch (exception) {
+                    // If the library doesn't use semver
+                    version = split[1] || library.versions[0];
+                }
+                const assets = library.assets.filter(x => x.version === version)[0];
+                return { name, range, url: `https://cdn.jsdelivr.net/${name}/${version}/${assets.mainfile}` };
+            } else {
+                return { name, range };
+            }
+        });
 }
 
 function listen(module) {
@@ -120,23 +127,24 @@ export default function define(a, b, c) {
         .replace(requireRegex, (_, dependency) => dependencies.push(dependency));
     */
 
-    Promise.all(dependencies.map(dep => {
-        const resolved = resolve(dep);
-        debug('donotload', donotload, 'id', id);
-        if (resolved.url && !donotload.includes(dep)) {
-            const element = document.createElement('script');
-            element.addEventListener('load', function() {
-                debug('lastDefined', lastDefined, 'id', dep);
-                modules.set(dep, modules.get(lastDefined));
-                moduleListeners.get(dep).forEach(x => x(modules.get(dep)));
-            });
-            element.src = resolved.url;
-            element.async = false; // TODO: figure out how to make this not async
-            donotload.push(dep);
-            document.body.appendChild(element);
-        }
-        return listen(resolved.name);
-    })).then(resolved => {
+    Promise.all(dependencies.map(dep => resolve(dep)
+        .then(resolved => {
+            debug('donotload', donotload, 'id', id);
+            if (resolved.url && !donotload.includes(dep)) {
+                const element = document.createElement('script');
+                element.addEventListener('load', function () {
+                    debug('lastDefined', lastDefined, 'id', dep);
+                    modules.set(resolved.name, modules.get(lastDefined));
+                    (moduleListeners.get(resolved.name) || (debug(dep), [])).forEach(x => x(modules.get(dep)));
+                });
+                element.src = resolved.url;
+                element.async = false; // TODO: figure out how to make this not async
+                donotload.push(dep);
+                document.body.appendChild(element);
+            }
+            return listen(resolved.name);
+        })
+    )).then(resolved => {
         debug('resolved', resolved, 'id', id);
         debug('dependencies', dependencies, 'id', id);
         debug('a', a, 'b', b, 'c', c, 'id', id);
