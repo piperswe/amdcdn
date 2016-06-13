@@ -1,0 +1,39 @@
+{
+  "name": "amdcdn",
+  "version": "1.0.0",
+  "description": "An AMD module loader that can load modules from a CDN",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rollup -f iife --name define index.js -o output.js",
+    "prepublish": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zebMcCorkle/amdcdn.git"
+  },
+  "keywords": [
+    "module",
+    "loader",
+    "cdn",
+    "amd"
+  ],
+  "author": "Zebulon McCorkle <zebmccorkle@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zebMcCorkle/amdcdn/issues"
+  },
+  "homepage": "https://github.com/zebMcCorkle/amdcdn#readme",
+  "dependencies": {
+    "babel-polyfill": "^6.9.1",
+    "u-semver": "^0.7.1",
+    "whatwg-fetch": "^1.0.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.10.1",
+    "babel-preset-es2015": "^6.9.0",
+    "cjs-to-es6": "^1.0.1",
+    "rollup": "^0.31.1",
+    "uglify-js": "^2.6.2"
+  }
+}
